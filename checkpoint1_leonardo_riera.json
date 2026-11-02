@@ -1,0 +1,238 @@
+{
+  "name": "checkpoint1_leonardo_riera",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f7043e37-87d0-42b8-847b-abb63a731c49",
+      "name": "When chat message received",
+      "webhookId": "28a8e07a-11bb-4d7e-b006-4e4db10301a1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# ROLE\nSos el agente de atención inicial de Imperio Tickets, una plataforma de venta online de entradas para eventos.\n\n# SCOPE\nAtendés consultas relacionadas con:\n- Compra de entradas.\n- Pagos y problemas durante la compra.\n- Recepción de entradas digitales y códigos QR.\n- Acceso a eventos.\n- Funcionamiento general de Imperio Tickets.\n- Productores interesados en vender entradas.\n- Productores activos que necesitan soporte.\n\n# OBJECTIVE\nTu objetivo es interpretar la consulta del usuario y brindar una respuesta inicial clara, breve y profesional.\n\nDebés identificar cuándo una consulta puede resolverse directamente y cuándo necesita seguimiento del equipo de Imperio Tickets.\n\nCuando corresponda, utilizá las herramientas disponibles para registrar los casos que requieren revisión.\n\n# RULES\n- Respondé solamente consultas relacionadas con Imperio Tickets.\n- No inventes información sobre eventos, precios, disponibilidad, pagos ni condiciones comerciales.\n- No confirmes reembolsos, cancelaciones ni modificaciones de entradas.\n- No afirmes que una compra fue aprobada ni que un QR es válido sin verificarlo mediante una herramienta autorizada.\n- No solicites contraseñas ni datos completos de tarjetas bancarias.\n- Utilizá las herramientas únicamente cuando la consulta requiera la función descripta por ellas.\n- Si podés responder directamente con información disponible, no utilices herramientas.\n- No utilices lenguaje inclusivo con terminaciones e, x o @.\n\n# ESCALATION\nSi la consulta involucra problemas con pagos, entradas QR, acceso, reclamos, solicitudes comerciales de productores o información que no podés verificar, registrá el caso mediante la herramienta correspondiente, si está disponible.\n\nInformá al usuario que su consulta requiere revisión humana.\nNunca prometas plazos de resolución que no estén confirmados.",
+          "maxIterations": 7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "985ee42e-7694-4217-9791-e1048955fca8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {
+          "maxTokensToSample": 2500,
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        192,
+        192
+      ],
+      "id": "8c385673-c5c9-4a55-bd76-6e434326d3fa",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "dJlqwRjphG3buDql",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Registra en Google Sheets las consultas recibidas por Imperio Tickets que necesitan seguimiento o revisión humana.\n\nUtilizá esta herramienta cuando una persona informe problemas con pagos, compras, recepción de entradas QR, acceso a eventos o funcionamiento de la plataforma.\n\nTambién debés utilizarla cuando un productor solicite información comercial para vender entradas o cuando un productor activo necesite soporte.\n\nAl registrar la consulta, identificá el tipo de usuario, la categoría del problema y si requiere revisión humana. Conservá el mensaje original sin inventar información.\n\nNo utilices esta herramienta para consultas informativas generales que puedas responder directamente.\n\nNunca afirmes que registraste una consulta si la herramienta no confirmó la operación.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1GqFP1D6JjYHipMeELmViwDIzWxkB9h-1tee0xmBGEEA",
+          "mode": "list",
+          "cachedResultName": "imperio_automation2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqFP1D6JjYHipMeELmViwDIzWxkB9h-1tee0xmBGEEA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Consultas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GqFP1D6JjYHipMeELmViwDIzWxkB9h-1tee0xmBGEEA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "Consulta": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Consulta', ``, 'string') }}",
+            "Tipo_usuario": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tipo_usuario', ``, 'string') }}",
+            "Categoría": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Categor_a', ``, 'string') }}",
+            "Requiere_revisión": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Requiere_revisi_n', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Consulta",
+              "displayName": "Consulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo_usuario",
+              "displayName": "Tipo_usuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoría",
+              "displayName": "Categoría",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Requiere_revisión",
+              "displayName": "Requiere_revisión",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        208
+      ],
+      "id": "df9a8504-64e7-4f9a-a017-4e60b16eb015",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sj0MpQdPgtFdvN6O",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "imperio.automation@gmail.com",
+        "subject": "Imperio Automation 2 | Log de ejecución",
+        "emailType": "text",
+        "message": "={{ 'CONSULTA RECIBIDA:\\n' + $('When chat message received').first().json.chatInput + '\\n\\nRESPUESTA DEL AGENTE:\\n' + $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "171b0fab-8d88-42da-954b-adb33b511a8d",
+      "name": "Send a message",
+      "webhookId": "8fbba6f9-3d48-4f22-8ccb-f5ae5a4d2f14",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "h9UmxSyfPNi9QYbe",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a7aadd19-8c1b-46e9-8e19-ae6ca35552e0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "390f61c92c2728de7a3d37eafa80bebe916a8cf193b9f2c5d51a8ab20f47ba2d"
+  },
+  "nodeGroups": [],
+  "id": "kQIq6rDlwtS2XRWf",
+  "tags": []
+}
