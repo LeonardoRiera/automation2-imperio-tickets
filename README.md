@@ -3,9 +3,9 @@
 
 ## Sobre el proyecto
 
-Imperio Tickets es una plataforma de venta online de entradas para eventos, en la que participo como cofundador.
+Imperio Tickets es una plataforma de venta online de entradas para eventos.
 
-Para este proyecto de Automation IA Avanzado, decidí trabajar sobre una necesidad real de la plataforma: mejorar la gestión de consultas de compradores y productores mediante inteligencia artificial.
+Para este proyecto de Automation IA Avanzado, decidí trabajar sobre una necesidad de la plataforma: mejorar la gestión de consultas de compradores y productores mediante inteligencia artificial.
 
 ## Módulo 1 — Agente de atención inicial
 
