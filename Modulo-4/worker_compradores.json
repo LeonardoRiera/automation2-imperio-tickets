@@ -1,0 +1,195 @@
+{
+  "name": "checkpoint2_worker_compradores",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "consulta"
+            },
+            {
+              "name": "tipo_usuario"
+            },
+            {
+              "name": "categoria"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f431a85e-7b3d-4713-998b-5bd89a5139f5",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "e246a21d-4a6f-4ff2-9e4e-5ab373274471",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "dJlqwRjphG3buDql",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'Consulta del comprador: ' + $json.consulta + '\\nCategoría temática: ' + $json.categoria }}",
+        "options": {
+          "systemMessage": "# ROLE\nSos un agente especializado en atención a compradores de Imperio Tickets, una plataforma de venta online de entradas para eventos.\n\n# SCOPE\nAtendés consultas relacionadas con compras, pagos, recepción de entradas digitales, códigos QR, acceso a eventos y soporte para compradores.\n\n# INPUT\nRecibís desde el Manager:\n- consulta: mensaje original del usuario.\n- tipo_usuario: comprador.\n- categoria: clasificación temática de la consulta.\n\nLas categorías posibles son:\n- PAGOS: pagos, cobros, devoluciones y transacciones.\n- ENTRADAS_QR: recepción de entradas, códigos QR y acceso a eventos.\n- GESTION_EVENTOS: administración y gestión de eventos.\n- SOPORTE: errores técnicos y problemas de funcionamiento.\n- COMERCIAL: información comercial sobre la plataforma.\n- GENERAL: otras consultas informativas.\n\nUtilizá la categoría como contexto para interpretar la consulta, pero priorizá siempre el contenido del mensaje original.\n\n# OBJECTIVE\nAnalizar la consulta recibida y generar una respuesta inicial clara, breve y profesional para el comprador.\n\n# RULES\n- Respondé exclusivamente dentro de tu especialidad de atención a compradores.\n- No inventes información sobre compras, pagos, eventos ni entradas.\n- No confirmes pagos, reembolsos ni validez de códigos QR sin verificación.\n- No solicites contraseñas ni datos bancarios sensibles.\n- Si el problema requiere verificar una operación, indicá que necesita revisión humana.\n- No prometas plazos de resolución.\n- No utilices lenguaje inclusivo con terminaciones e, x o @.\n- No incluyas estructuras JSON en la respuesta: el nodo Edit Fields posterior se encarga de normalizar la salida.\n\n# OUTPUT\nDevolvé una respuesta breve en español para el comprador.\n",
+          "maxIterations": 7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8b79afc4-ac9e-4f33-9659-07596d408e8c",
+      "name": "Agente - Compradores",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f6797d3a-77d8-407a-93f9-4de5f09268ca",
+              "name": "status",
+              "value": "success",
+              "type": "string"
+            },
+            {
+              "id": "2b245aee-259b-4e14-bd7e-82c88c03ee84",
+              "name": "worker",
+              "value": "compradores",
+              "type": "string"
+            },
+            {
+              "id": "94d8ac20-4102-43a3-bf85-12c4c18bc674",
+              "name": "respuesta",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        592,
+        0
+      ],
+      "id": "a00cfd7f-58be-4b04-a930-6d6e2f97c734",
+      "name": "Salida JSON - Compradores"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43884098-3d99-4e74-8c08-69a524d13a25",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "1d4269a0-3439-41c6-9c0e-a62f3d4a8435",
+              "name": "worker",
+              "value": "compradores",
+              "type": "string"
+            },
+            {
+              "id": "393593f7-ca26-4c0a-97ca-f2cfd326d42a",
+              "name": "respuesta",
+              "value": "No pudimos procesar tu consulta en este momento. Tu caso necesita revisión del equipo de Imperio Tickets.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        576,
+        272
+      ],
+      "id": "242dd1be-3f08-4d19-957f-2505032cc836",
+      "name": "Error JSON - Compradores"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Agente - Compradores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente - Compradores",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente - Compradores": {
+      "main": [
+        [
+          {
+            "node": "Salida JSON - Compradores",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error JSON - Compradores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "55e91075-b07d-4744-aca5-5fa09be47d39",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "390f61c92c2728de7a3d37eafa80bebe916a8cf193b9f2c5d51a8ab20f47ba2d"
+  },
+  "nodeGroups": [],
+  "id": "9XweRcT0NBbbI3qz",
+  "tags": []
+}
